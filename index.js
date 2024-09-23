@@ -8,20 +8,33 @@ app.set("views", path.join(__dirname, "views"));
 
 const readFile = (filename) => {
   return new Promise((resolve, reject) => {
-    fs.readFile("./tasks", "utf8", (err, data) => {
+    fs.readFile("./tasks.json", "utf8", (err, data) => {
       if (err) {
         console.error(err);
         return;
       }
-
-      const tasks = data.split("\n");
+      // tasks list data from file
+      const tasks = JSON.parse(data);
       resolve(tasks);
     });
   });
 };
 
+const writeFile = (filename, data) => {
+  return new Promise((resolve, reject) => {
+    // get data from file
+    fs.writeFile("./tasks.json", data, "utf-8", (err) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      resolve(true);
+    });
+  });
+};
+
 app.get("/", (req, res) => {
-  readFile("./tasks").then((tasks) => {
+  readFile("./tasks.json").then((tasks) => {
     console.log(tasks);
     res.render("index", { tasks: tasks });
   });
@@ -31,18 +44,71 @@ app.use(express.urlencoded({ extended: true }));
 
 app.post("/", (req, res) => {
   //tasks list data from file
-  readFile("./tasks").then((tasks) => {
-    // add form sent task to array
-    tasks.push(req.body.task);
-    const data = tasks.join("\n");
-    fs.writeFile("./tasks", data, (err) => {
+  readFile("./tasks.json").then((tasks) => {
+    //add new task
+    //add new id automatically
+    let index;
+    if (tasks.length === 0) {
+      index = 0;
+    } else {
+      index = tasks[tasks.length - 1].id + 1;
+    }
+
+    // create a task object
+    const newTask = {
+      id: index,
+      task: req.body.task,
+    };
+
+    console.log(newTask);
+    // add form sent task to tasks array
+    tasks.push(newTask);
+    data = JSON.stringify(tasks, null, 2);
+    writeFile("tasks.json", data);
+    console.log(data);
+    fs.writeFile("./tasks.json", data, "utf-8", (err) => {
+      if (err) {
+        console.error(err);
+        return;
+      } else {
+        console.log("saved");
+      }
+
+      // redirect to see result
+      res.redirect("/");
+    });
+  });
+});
+
+app.get("/delete-task/:taskId", (req, res) => {
+  let deletedTaskId = parseInt(req.params.taskId);
+  readFile("./tasks.json").then((tasks) => {
+    tasks.forEach((task, index) => {
+      if (task.id === deletedTaskId) {
+        tasks.splice(index, 1);
+      }
+    });
+    data = JSON.stringify(tasks, null, 2);
+    fs.writeFile("./tasks.json", data, "utf-8", (err) => {
       if (err) {
         console.error(err);
         return;
       }
-      // redirect to see result
+      // redirect to / to see result
       res.redirect("/");
     });
+  });
+});
+
+app.get("/delete-tasks", (req, res) => {
+  fs.writeFile("./tasks.json", "[]", "utf-8", (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+
+    // redirect to / to see result
+    res.redirect("/");
   });
 });
 

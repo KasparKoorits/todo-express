@@ -5,10 +5,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial scale=1" />
     <!-- Compiled and minified CSS -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
-    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"/>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   </head>
   <body>
     <div class="container">
@@ -31,11 +29,16 @@
                     </div>
                     <div class="card-action">
                         <ul class="collection">
-                          <% console.log(tasks) %>
                           <% tasks.forEach((task) => { %>
-                            <li class="collection-item"><%= task%></li>
+                            <li class="collection-item">
+                              <%= task.task %>
+                              <a href="delete-task/<%= task.id %>" class="secondary-content"><i class="material-icons">delete</i></a>
+                            </li>
                           <% }) %>
                         </ul>
+                        <div>
+                          <a href="/delete-tasks" class="btn btn-danger">Clear All</a>
+                        </div>
                     </div>
                 </div>
             </div>
