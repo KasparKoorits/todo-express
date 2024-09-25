@@ -10,5 +10,13 @@
   {
     "id": 2,
     "task": "Study JS"
+  },
+  {
+    "id": 4,
+    "task": "Study HTML"
+  },
+  {
+    "id": 5,
+    "task": "Work on this ToDo list"
   }
 ]
